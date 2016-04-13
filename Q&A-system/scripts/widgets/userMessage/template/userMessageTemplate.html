@@ -1,0 +1,61 @@
+<div id="userMessage" class="user-message">
+	<div id="userImage" class="user-image">
+		<img style="border-radius: 50% 50%;" id="userPhotoImage" width="100" height="100" src="images/userImages/default-user-image.jpg" />
+	</div>
+	
+	<div>
+		<span style="font-size: 20px;">{{username}} &bull; {{userrole}} </span>
+		<span style="margin-left: 20px; color: #f30; font-weight: bold;">粉丝 {{fansAmount}} 个</span>
+	</div>
+
+	<div>
+		<span id="updateMsgBtn" class="update-msg-btn" ng-click="showUpdateMessage()">设置</span>
+	</div>
+
+</div>
+<div id="userAskQuestion" class="user-ask-question">
+	<span>我提出的问题</span>
+	<ul class="question-ul">
+		<li ng-repeat="question in currentUserQuestions"><span>{{question.q_title}}</span></li>
+	</ul>
+</div>
+
+<div id="userResponseQuestion" class="user-response-question">
+	<span>我回答的问题</span>
+	<ul class="question-ul">
+		<li>response 1</li>
+		<li>response 2</li>
+		<li>response 3</li>
+	</ul>
+</div>
+
+<div id="updateUserMessage" class="update-user-message" ng-show="updateUserMessageVisible" >
+
+	<form name="updateUserMessageForm" class="update-user-msg-form">
+		<div style="margin-top: 15px;">
+			<label>头像</label>
+			<form enctype="multipart/form-data">
+				<input type="file" id="userPhoto" name="userPhoto" style="display: inline-block; width: 180px;" />
+				<input type="submit" id="uploadPhoto" value="上传" class="update-photo-btn"/>
+			</form>
+		</div>
+
+		<div style="margin-top: 15px;">
+			<label>用户名</label>
+			<input type="text" name="updateusername" ng-model="updateusername" id="updateusername" class="update-input-style" placeholder="User name" required/>
+		</div>
+		<div style="margin-top: 15px;">
+			<label>密码</label>
+			<input type="password" name="updatepassword1" ng-model="updatepassword1" id="updatepassword1" class="update-input-style" placeholder="password" required/>
+		</div>
+		<div style="margin-top: 15px;">
+			<label>确认密码</label>
+			<input type="password" name="updatepassword2" ng-model="updatepassword2" id="updatepassword2" class="update-input-style" placeholder="password again" required/>
+		</div>
+		
+		<div style="margin-top: 15px; text-align: center;">
+			<input type="button" class="update-submit" name="updatecancle" id="updatecancle" value="取 消" style="margin-right: 50px;" ng-click="hiddenUpdateMessage()" />
+			<input type="submit" class="update-submit" name="updatesubmit" id="updatesubmit" value="保 存" ng-click="updateUserMessage()" />
+		</div>
+	</form>
+</div>

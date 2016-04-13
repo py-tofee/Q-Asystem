@@ -1,0 +1,88 @@
+.user-message {
+	margin: 20px auto;
+	text-align: center;
+}
+
+.user-image {
+	width: 100px;
+	height: 100px;
+	margin: 10px auto;
+}
+
+.update-msg-btn {
+	display: inline-block;
+	background-color: transparent; 
+	margin-top: 15px;
+	color: #f30;
+	border-bottom: 1px solid #f30;
+	cursor: pointer;
+}
+
+.user-ask-question, .user-response-question {
+	width: 360px;
+	margin: 30px auto;
+}
+
+.question-ul li {
+	cursor: pointer;
+	margin-top: 10px;
+}
+.question-ul li:hover {
+	color: #f30;
+	text-decoration: underline;
+}
+
+.update-user-message {
+	position: fixed;
+	top: 200px;
+	left: 40px;
+	width: 320px;
+	height: 230px;
+	background-color: #fff;
+	z-index: 999;
+}
+.update-user-msg-form {
+	margin: 0 auto;
+}
+
+.update-photo-btn {
+	color: #f30;
+	border: none;
+	background: transparent;
+	border-bottom: 1px solid #f30;
+
+}
+
+.update-user-message label {
+	display: inline-block;
+	width: 70px;
+	margin-right: 15px;
+	text-align: right;
+}
+
+.update-input-style {
+	width: 200px;
+	height: 30px;
+	line-height: 30px;
+	padding-left: 10px;
+	border: 1px solid #ccc;
+	border-radius: 20px;
+}
+.update-input-style:focus {
+	padding-left: 10px;
+	border: 1px solid #f30;
+	border-radius: 20px;
+	outline: none;
+}
+
+.update-submit {
+	display: inline-block;
+	width: 70px;
+	height: 30px;
+	line-height: 30px;
+	border: 1px solid #f30;
+	border-radius: 25px;
+	background-color: #f30;
+	color: white;
+	text-align: center;
+}

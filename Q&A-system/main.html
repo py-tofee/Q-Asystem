@@ -1,0 +1,43 @@
+<div class="ng-scope modal-open mainContainer" 
+	ng-controller="AppController" 
+	style="overflow-x: hidden; overflow-y:hidden;">
+	<!-- left -->
+	<div class="leftContainer">
+		<div class="userContent">
+			<!-- 1用户信息、2该用户提出的问题、3和做出的回答 -->
+			<user-message></user-message>
+		</div>
+	</div>
+	<!-- right -->
+	<div class="rightContainer">
+		<div class="right-content-header">
+			<ul class="menu-box">
+				<li class="menu-bar home-page-bar" ng-class="{'menu-active': selectesMenu == 'homePage'}" ng-click="activeMenu('homePage')"><span>首页</span></li>
+				<li class="menu-bar hot-question-bar" ng-class="{'menu-active': selectesMenu == 'hotQuestion'}" ng-click="activeMenu('hotQuestion')"><span>精彩问答</span></li>
+				<li class="menu-bar ask-question-bar" ng-class="{'menu-active': selectesMenu == 'askQuestion'}" ng-click="activeMenu('askQuestion')"><span>我要提问</span></li>
+				<li class="search" >
+					<form class="search-form">
+						<input class="search-query" name="query" placeholder="搜索" type="search" />
+					</form>
+				</li>
+			</ul>
+		</div>
+		<div class="right-content-content">
+			<!-- 首页 -->
+			<home-page></home-page>
+			<!-- 条件筛选（问题类型） 问题title模板  ng-repeat -->
+			<!-- 查看更多 -->
+
+			<!-- 精彩问答 -->
+			<hot-question></hot-question>
+
+			<!-- 我要提问 -->
+			<ask-question></ask-question>
+
+			<!-- 通过搜索得到的问题列表 -->
+
+			<!-- 问题详情  内容和评论（回答）调转到另一个页面？url加上问题id -->
+		</div>
+		<div class="right-content-footer"></div>
+	</div>
+</div>

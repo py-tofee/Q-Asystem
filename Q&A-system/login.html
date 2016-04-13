@@ -1,0 +1,49 @@
+<div class="loginpage" ng-controller="loginController">
+	<div class="container">
+		<div class="text-center loginheader">在线辅导答疑系统</div>
+		<div class="loginbox" ng-show="loginboxVisible">
+			<form name="loginForm">
+				<div class="form-group" ng-class="{ 'has-error': loginForm.username.$error.required && loginForm.username.$dirty }">
+					<input type="text" name="username" ng-model="username" class="form-control" id="username" placeholder="User name" required/>
+				</div>
+				<div class="form-group" ng-class="{ 'has-error': loginForm.password.$error.required && loginForm.password.$dirty }">
+					<input type="password" name="password" ng-model="password" class="form-control" id="password" placeholder="Password" required/>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="form-control loginbtn"  ng-click="login()" >登&nbsp;&nbsp;&nbsp;录</button>
+				</div>
+				<div>
+					<span ng-show="loginError" ng-init="loginError=false" class="error-message" ng-cloak>{{loginErrorMessage}}</span>
+				</div>
+			</form>
+
+			<div>
+				<p class="text-center to-register" ng-click="showRegisterBox()">新用户注册</p>
+			</div>
+		</div>
+
+		<div class="registerbox" ng-show="registerboxVisible">
+			<form name="registerForm">
+				<div class="form-group" ng-class="{ 'has-error': registerForm.regisname.$error.required && registerForm.regisname.$dirty }">
+					<input type="text" name="regisname" ng-model="regisname" class="form-control" id="regisname" placeholder="User name" required/>
+				</div>
+				<div class="form-group" ng-class="{ 'has-error': registerForm.regispassword.$error.required && registerForm.regispassword.$dirty }">
+					<input type="password" name="regispassword" ng-model="regispassword" class="form-control" id="regispassword" placeholder="Password" required/>
+				</div>
+				<div class="form-group" ng-class="{ 'has-error': registerForm.regisrole.$error.required && registerForm.regisrole.$dirty }">
+					<input type="text" name="regisrole" ng-model="regisrole" class="form-control" id="regisrole" placeholder="Student/Teacher" required/>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="form-control registerbtn"  ng-click="register()" >注&nbsp;&nbsp;&nbsp;册</button>
+				</div>
+				<div>
+					<span ng-show="registerError" ng-init="registerError=false" class="error-message" ng-cloak>{{registerErrorMessage}}</span>
+				</div>
+			</form>
+
+			<div>
+				<p class="text-center to-login" ng-click="showLoginBox()">直接登录</p>
+			</div>
+		</div>
+	</div>
+</div>

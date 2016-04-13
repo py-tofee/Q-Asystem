@@ -1,0 +1,100 @@
+<div id="homePage" class="home-page" ng-if="homePageVisible">
+	<!-- 问题类型筛选 -->
+	<div id="questionType" class="question-type">
+		<div ng-show="queryConditionsVisible">
+			<span style="font-weight: bold; color: #f30;">已选择</span>
+			<ul id="questionTypeSelected" class="question-type-selected">
+				<li ng-repeat="c in queryConditions" class="redunderlineclass">{{c}}
+					<i class="icon-remove" ng-click="removeCondition($index)"></i>
+				</li>
+			</ul>
+		</div>
+		
+		<div>
+			<span style="font-weight: bold; color: #f30;">问题类型</span>
+			<ul id="questionTypeArea" class="question-type-area">
+				<li class="redunderlineclass" ng-repeat="t in allTypes" ng-click="queryByConditions(1)">{{t.category}}</li>
+			</ul>
+		</div>
+	</div>
+	<!-- model ng-repeate-->
+	<div id="questionContentModel" class="question-content-model">
+		<div class="question-model" ng-repeat="q in curPageQuestions">
+			<div class="question-author">
+				<span class="author-name" ng-mouseover="showAuthorMessage($index, q)" ng-mouseout="hideAuthorMessage()">{{q.q_username}}</span>
+				<span class="bullstyle">&bull;</span>
+				<span class="question-create-time">{{q.q_create_time}}</span>
+			</div>
+			<div class="question-title redunderlineclass" id="question{{q.q_id}}" ng-click="showQuestionDetails($index)">
+				<h4>{{q.q_title}}</h4>
+			</div>
+			
+			<div class="question-accessed-msg">
+				<span class="redunderlineclass">阅读量 {{q.q_read_amount}}</span>
+				<span class="bullstyle">&bull;</span>
+				<span class="redunderlineclass"><i class="icon-comment-alt"></i> 回答 {{q.q_answer_amount}}</span>
+				<span class="bullstyle">&bull;</span>
+				<span class="redunderlineclass"><i class="icon-heart-empty"></i> 喜欢 {{q.q_concern_amount}}</span>
+			</div>
+
+			<div id="questionContent" class="question-content" ng-show="answe_index == $index">
+				<div class="question-content-header">
+					<img ng-src="{{q.photo_path}}" style="border-radius: 50% 50%;" width="50" height="50">
+					<span class="author-mark">作 者</span>
+					<span style="color: #9cf; font-size: 17px; margin-right: 13px;">{{q.q_username}}</span>
+					<span style="color: #666;">{{q.q_create_time}}</span>
+					<span class="concern-btn" style="margin-left: 300px;" ng-click="addConcern()">添加关注</span>
+				</div>
+				<div>
+					<p style="font-size: 25px; font-weight: bold; color: #555;">{{q.q_title}}</p>
+					<div class="question-property">
+						<span>类别<em>{{q.q_category}}</em></span>
+						<span>阅读量<em>{{q.q_read_amount}}</em></span>
+						<span>回答<em>{{q.q_answer_amount}}</em></span>
+						<span>赞<em>{{q.q_concern_amount}}</em></span>
+					</div>
+				</div>
+				<div style="margin: 30px auto;">
+					<div ng-bind-html="TrustDangerousSnippet(q.q_content)"></div>
+				</div>
+				<div>
+					<div style="padding: 10px 50px;; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+						<span>一共<span style="color: rgba(255,0,0,0.5);"> {{q.q_answer_amount}} </span>条回答</span>
+						<span style="float: right; cursor: pointer;" ng-click="addNewAnswer()"><i class="icon-edit"></i> 添加新回答</span>
+					</div>
+					<div style="margin: 30px auto;">回答列表</div>
+					<div class="comment-text">
+						<textarea id="commentContent" class="comment-content" maxlength="2000" placeholder="写下你的回答..." name="commentContent"></textarea>
+						<div>
+							<input type="submit" name="commit" id="commit" value="发表" data-disable-with="提交中..." class="btn btn-info" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 鼠标放在作者名称上 显示作者信息 -->
+	<div id="authorMsg" class="author-msg" ng-show="authorMsgVisible" ng-mouseover="showAuthorMessage()" ng-mouseout="hideAuthorMessage()">
+		<div>
+			<img style="border-radius: 50% 50%;" id="userPhotoImage" width="60" height="60" ng-src="{{photo_path}}" />
+			<span style="font-size: 16px; margin: 0 20px;">{{authorName}} &bull; {{userrole}} </span>
+			<span class="concern-btn" ng-click="addConcern()">添加关注</span>
+		</div>
+		<div style="margin-top: 30px;">
+			<span style="font-size: 15px; padding-right: 20px; display: inline-block; border-right: 1px solid #f30;">粉丝 {{fans_amount}} 个</span>
+			<span style="font-size: 15px; padding: 0 20px; display: inline-block; border-right: 1px solid #f30;">提问 {{questionAmount}} 个</span>
+			<span style="font-size: 15px; padding-left: 20px;">回答 {{answerAmount}} 个</span>
+		</div>
+		<span class="triangle-down transform"></span>
+	</div>
+	<!-- 分页 -->
+	<div ng-show="pageTotleNum > 0" style="text-align: center;">
+		<ul class="pagination" id="pagination">
+			<li id="laquo" style="cursor: pointer;" ng-click="selectePage(curPage-1)" ng-class="{'disabled': curPage == 1}"><span>&laquo;</span></li>
+			<li ng-repeat="page in pageArray" ng-click="selectePage(page)" style="cursor: pointer;"
+			ng-class="{'active': curPage == page}"><span>{{page}}</span></li>
+			<li id="raquo" style="cursor: pointer;" ng-click="selectePage(curPage+1)" ng-class="{'disabled': curPage == pageTotleNum}"><span>&raquo;</span></li>
+		</ul>
+	</div>
+</div>
