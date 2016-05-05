@@ -7,7 +7,7 @@ from PIL import Image
 import math
 
 from App.server import app, db, auth
-from App.models import User, Question
+from App.models import User, Question, Answer
 
 import json
 from functools import wraps
@@ -133,6 +133,13 @@ def create_questions():
 
 		user = db.session.query(User).filter(User.user_id == request.form['q_userid']).first()
 		new_question = Question(request.form['q_category'], request.form['q_title'], request.form['q_content'], user)
+		
+
+		if 'invited_user_name' in request.form :
+			invied_user = db.session.query(User).filter(User.name == request.form['invited_user_name']).first()
+			new_question.q_invited_userid = invied_user.user_id
+			print(invied_user.user_id)
+
 		db.session.add(new_question)
 		db.session.commit()
 
@@ -154,6 +161,29 @@ def create_questions():
 		}
 
 		return json.dumps({'data': {'message': 'success', 'question': this_new_question, 'q_user': q_user}})
+
+# 获取当前用户收到的邀请问题
+@app.route('/QASystem/get/currentUser/invited/questions', methods=['POST'])
+@return_json
+def get_cur_user_invited_questions():
+	if request.form and 'user_id' in request.form:
+		invited_questions = db.session.query(Question).filter(Question.q_invited_userid == request.form['user_id']).all()
+
+		invitedQuestions = []
+		for q in invited_questions:
+			question = {
+				'q_id': q.q_id,
+				'q_title': q.q_title,
+				'q_category': q.q_category,
+				'q_content': q.q_content,
+				'q_create_time': q.q_create_time,
+				'q_userid': q.user.user_id,
+				'q_read_amount': q.q_read_amount,
+				'q_concern_amount': q.q_concern_amount,
+				'q_answer_amount': q.q_answer_amount
+			}
+			invitedQuestions.append(question)
+		return json.dumps({'data': {'message': 'success', 'invitedQuestions': invitedQuestions, 'invitedQuestionsNum': len(invited_questions)}})
 
 # 获取当前用户 提的问题
 @app.route('/QASystem/get/currentUser/questions', methods=['POST'])
@@ -198,21 +228,23 @@ def getAllType():
 		allUniqueTypes.append(category)
 	return json.dumps({'data': {'message': 'success', 'allTypes': allUniqueTypes}})
 
-# 首页  根据条件查找问题
+# 首页  根据条件查找问题 / 全局搜索
 @app.route('/QASystem/query/byConditions/<int:page>', methods=['POST'])
 @return_json
 def query_by_conditions(page):
-	print('12345')
 	if request.form and 'conditions' in request.form:
-		print('12345')
 		pageSize = 10
 		if request.form['conditions'] == 'all' :
 			allQuestions = db.session.query(Question).all()
+		elif request.form['conditions'] == 'queryByContent' and 'content' in request.form :
+			allQuestions = db.session.query(Question).filter(Question.q_title.like('%'+request.form["content"]+'%')).all()
+			print(allQuestions)
 		else:
-			conditionInfo = request.form['conditions']
-			print('ok')
-			print(conditionInfo.split('&'))
-			return json.dumps({'data': 'ok'})
+			conditionInfo = request.form['conditions'].split('&')
+			allQuestions = []
+			for c in conditionInfo:
+				match_question = db.session.query(Question).filter(Question.q_category == c).all()
+				allQuestions = allQuestions + match_question
 
 		pageTotleNum = math.ceil(len(allQuestions)/pageSize)
 		print('pageTotleNum', pageTotleNum)
@@ -251,16 +283,144 @@ def query_by_conditions(page):
 @app.route('/QASystem/create/answer', methods=['POST'])
 @return_json
 def create_answer():
-	pass
+	if request.form and 'q_id' in request.form and 'user_id' in request.form and 'content' in request.form:
+		this_question = db.session.query(Question).filter(Question.q_id == request.form['q_id']).first()
+		this_user = db.session.query(User).filter(User.user_id == request.form['user_id']).first()
+		new_answer = Answer(request.form['content'], this_user, this_question)
+		db.session.add(new_answer)
+		db.session.commit()
 
-# 获取当前用户的所有回答
+		answer = {
+			'a_id': new_answer.a_id,
+			'a_create_time': new_answer.a_create_time,
+			'a_content': new_answer.a_content,
+			'a_like_amount': new_answer.a_like_amount,
+			'a_user_id': new_answer.user.user_id,
+			'a_user_name': new_answer.user.name,
+			'a_user_role': new_answer.user.role,
+			'a_user_photo_path': new_answer.user.photo_path,
+			'a_user_fans_amount': new_answer.user.fans_amount,
+			'a_q_id': new_answer.question.q_id
+		}
+
+		return json.dumps({'data': {'message': 'success', 'answer': answer}})
+
+# 获取当前用户的所有回答的问题
 @app.route('/QASystem/get/currentUser/answers', methods=['POST'])
 @return_json
 def get_cur_user_answers():
-	pass
+	if request.form and 'user_id' in request.form:
+		user = db.session.query(User).filter(User.user_id == request.form['user_id']).first()
+		answers = user.answer.all()
+		useranswers = []
+
+		for a in answers:
+			answer = {
+				'a_id': a.a_id,
+				'a_create_time': a.a_create_time,
+				'a_content': a.a_content,
+				'a_like_amount': a.a_like_amount,
+				'a_q_id': a.question.q_id,
+				'a_q_title': a.question.q_title
+			}
+			useranswers.append(answer)
+		return json.dumps({'data': {'message': 'success', 'useranswers': useranswers, 'answersNum': len(answers)}})
 
 # 获取当前问题的所有回答
 @app.route('/QASystem/get/curQuestion/answers', methods=['POST'])
 @return_json
 def get_cur_question_answers():
-	pass
+	if request.form and 'q_id' in request.form:
+		question = db.session.query(Question).filter(Question.q_id == request.form['q_id']).first()
+		question.q_read_amount = question.q_read_amount + 1 # 访问量加1
+
+		answers = question.answer.all()
+		question.q_answer_amount = len(answers)
+		print(question.q_answer_amount)
+		db.session.add(question)
+		db.session.commit()
+
+		questionanswers = []
+
+		for a in answers:
+			answer = {
+				'a_id': a.a_id,
+				'a_create_time': a.a_create_time,
+				'a_content': a.a_content,
+				'a_like_amount': a.a_like_amount,
+				'a_user_id': a.user.user_id,
+				'a_user_name': a.user.name,
+				'a_user_role': a.user.role,
+				'a_user_photo_path': a.user.photo_path,
+				'a_user_fans_amount': a.user.fans_amount,
+				'a_q_id': a.question.q_id
+			}
+			questionanswers.append(answer)
+		return json.dumps({'data': {'message': 'success', 'questionanswers': questionanswers}})
+
+# 对回答点赞
+@app.route('/QASystem/addLike/to/answer', methods=['POST'])
+@return_json
+def add_like_to_answer():
+	if request.form and 'a_id' in request.form and 'addLike' in request.form:
+		answer = db.session.query(Answer).filter(Answer.a_id == request.form['a_id']).first()
+		answer.a_like_amount = answer.a_like_amount + int(request.form['addLike'])
+		db.session.add(answer)
+		db.session.commit()
+
+		return json.dumps({'data': {'message': 'success', 'like_amount': answer.a_like_amount}})
+
+
+# 对问题点赞
+@app.route('/QASystem/addLike/to/question', methods=['POST'])
+@return_json
+def add_like_to_question():
+	if request.form and 'q_id' in request.form and 'addLike' in request.form:
+		question = db.session.query(Question).filter(Question.q_id == request.form['q_id']).first()
+		question.q_concern_amount = question.q_concern_amount + int(request.form['addLike'])
+		db.session.add(question)
+		db.session.commit()
+
+		return json.dumps({'data': {'message': 'success', 'concern_amount': question.q_concern_amount}})
+
+# 关注用户
+@app.route('/QASystem/addLike/to/user', methods=['POST'])
+@return_json
+def add_like_to_user():
+	if request.form and 'user_id' in request.form and 'addLike' in request.form:
+		user = db.session.query(User).filter(User.user_id == request.form['user_id']).first()
+		user.fans_amount = user.fans_amount + int(request.form['addLike'])
+		db.session.add(user)
+		db.session.commit()
+
+		return json.dumps({'data': {'message': 'success', 'fans_amount': user.fans_amount}})
+
+# 获取最热门的10个问答
+@app.route('/QASystem/get/hot/questions', methods=['GET'])
+@return_json
+def get_hot_questions():
+	questions = db.session.query(Question).order_by(Question.q_read_amount).all()
+	hotQuestions = []
+
+	for q in questions[-10:]:
+		question = {
+				'q_id': q.q_id,
+				'q_title': q.q_title,
+				'q_category': q.q_category,
+				'q_content': q.q_content,
+				'q_create_time': q.q_create_time,
+				'q_userid': q.user.user_id,
+				'q_username': q.user.name,
+				'q_read_amount': q.q_read_amount,
+				'q_concern_amount': q.q_concern_amount,
+				'q_answer_amount': q.q_answer_amount,
+				'photo_path': q.user.photo_path,
+				'userrole': q.user.role,
+				'questionAmount': len(q.user.question.all()),
+				'answerAmount': len(q.user.answer.all()),
+				'fans_amount': q.user.fans_amount
+			}
+		hotQuestions.append(question)
+	hotQuestions.reverse()
+
+	return json.dumps({'data': {'message': 'success', 'hotQuestions': hotQuestions}})

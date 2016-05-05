@@ -15,9 +15,8 @@
 		'widgets/homePage/homePageBootstrap',
 		'widgets/askQuestion/askQuestionBootstrap',
 		'widgets/userMessage/userMessageBootstrap',
-		'widgets/hotQuestion/hotQuestionBootstrap',
-		'widgets/questionContent/questionContentBootstrap'
-		], function (angular, postal, AppController, loginController, homePageBootstrap, askQuestionBootstrap, userMessageBootstrap, hotQuestionBootstrap, questionContentBootstrap) {
+		'widgets/hotQuestion/hotQuestionBootstrap'
+		], function (angular, postal, AppController, loginController, homePageBootstrap, askQuestionBootstrap, userMessageBootstrap, hotQuestionBootstrap) {
 
 			function init() {
 				var app = angular.module('app', ['ngCookies', 'ngRoute']).config(function ($provide) {
@@ -68,7 +67,7 @@
 				askQuestionBootstrap.start(app)
 				userMessageBootstrap.start(app)
 				hotQuestionBootstrap.start(app)
-				questionContentBootstrap.start(app)
+				// questionContentBootstrap.start(app)
 
 				angular.bootstrap(document.body, ['app'])
 				return app

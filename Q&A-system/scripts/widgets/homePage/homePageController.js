@@ -12,6 +12,10 @@
 				$scope.authorMsgVisible = false
 				$scope.questionContentVisible = false
 
+				$scope.submiterrorVisible = false
+
+				homePageService.setController($scope)
+
 				// 响应menu的点击
 				$scope.$bus.subscribe({
 					channel: 'menu',
@@ -20,7 +24,7 @@
 						if(data.name == 'homePage') {
 							$scope.homePageVisible = true
 							getAllTypes()
-							$scope.initQuestion({'conditions': 'all'}, 1)
+							$scope.initQuestion($scope.queryConditions, 1)
 						}
 						else {
 							$scope.homePageVisible = false
@@ -45,14 +49,26 @@
 				// 按条件查找 初始化
 				$scope.initQuestion = function (queryConditions, page) {
 					var conditiondata = {}
-					if(queryConditions.length > 0){
-						var querystr = queryConditions.length + '&'
+					if(queryConditions instanceof Array && queryConditions.length > 0){
+						var querystr = ''
 						for (var i = 0; i < queryConditions.length; i++) {
-							querystr = querystr + queryConditions[i] + '&'
+							if(i == queryConditions.length-1){
+								querystr = querystr + queryConditions[i]
+							}else{
+								querystr = querystr + queryConditions[i] + '&'
+							}
+							
 						}
 						conditiondata = {'conditions': querystr}
-					}else{
-						conditiondata = {'conditions': 'all'}
+					}
+					else if (queryConditions instanceof Array && queryConditions.length == 0) {
+						conditiondata = {
+							'conditions': 'all'
+						}
+
+					}
+					else{
+						conditiondata = {'conditions': 'queryByContent', 'content': queryConditions}
 					}
 					
 					$.ajax({
@@ -126,13 +142,21 @@
 				$scope.addConcern = function () {
 					// 
 				}
+				
+				$scope.toAddNewAnswer = function () {
+					//跳转到创建回答的地方
+				}
 
-				$scope.showQuestionDetails = function (index) {
-					if($scope.answe_index == index){
-						$scope.answe_index = ''
+				$scope.showQuestionDetails = function (question, index) {
+					if($scope.oldindex == index){
+						$scope.answe_index = -1
+						$scope.oldindex = -1
 					}else {
 						$scope.answe_index = index
+						$scope.oldindex = index
+						get_answers(question.q_id)
 					}
+					
 				}
 
 				// $sce
@@ -140,8 +164,86 @@
 					return $sce.trustAsHtml(post)
 				}
 
-				$scope.addNewAnswer = function () {
-					//
+				// 创建回答 并提交
+				$scope.commitAnswer = function (question, index) {
+					if($('.comment-content')[index].value != ''){
+						$scope.submiterrorVisible = false
+						// alert($('#commentContent').val())
+						var answerData = {
+							'q_id': question.q_id,
+							'user_id': $cookies.user_id,
+							'content': $('.comment-content')[index].value
+						}
+						$.ajax({
+							type: 'post',
+							url: 'http://127.0.0.1:5000/QASystem/create/answer',
+							data: answerData,
+							dataType: 'json',
+							success: function (response) {
+								if (response.data.message == 'success') {
+									get_answers(question.q_id)
+								}
+								else {
+									$scope.submiterror = '发表失败'
+								}
+							}
+						})
+					}else {
+						$scope.submiterrorVisible = true
+						$scope.submiterror = '请输入你的回答'
+					}
+				}
+
+				// 获取当前问题的 回答列表
+				function get_answers(questionId) {
+					var data = {
+						'q_id': questionId
+					}
+					$.ajax({
+						type: 'post',
+						url: 'http://127.0.0.1:5000/QASystem/get/curQuestion/answers',
+						data: data,
+						dataType: 'json',
+						success: function (response) {
+							if (response.data.message == 'success') {
+								$scope.curQuestionAnswers = response.data.questionanswers
+							}
+						}
+					})
+				}
+
+				$scope.addLikeToAnswer = function (answerId) {
+					var addLike = 0
+					if ($scope.heartclass == 'icon-heart-empty'){
+						$scope.heartclass = 'icon-heart'
+						addLike = 1
+					}
+					else {
+						$scope.heartclass = 'icon-heart-empty'
+						addLike = -1
+					}
+					var data = {
+						'a_id': answerId,
+						'addLike': addLike
+					}
+					$.ajax({
+						type: 'post',
+						url: 'http://127.0.0.1:5000/QASystem/addLike/to/answer',
+						data: data,
+						dataType: 'json',
+						success: function (response) {
+							if (response.data.message == 'success') {
+								// $scope.likeAmount = response.data.like_amount
+							}
+						}
+					})
+				}
+
+				$scope.showCurQuestion = function (questionId) {
+					var container = $('body')
+					var scrollTo = $('#question'+questionId)
+					// 滚动到所点击的问题处
+					container.scrollTop(scrollTo.offset().top - 200)
 				}
 
 
@@ -156,7 +258,7 @@
 					return -1
 				}
 
-
+				$scope.heartclass = 'icon-heart-empty'
 				getAllTypes()
 				$scope.initQuestion($scope.queryConditions, 1)
 			}

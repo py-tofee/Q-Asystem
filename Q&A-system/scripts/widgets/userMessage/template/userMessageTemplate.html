@@ -5,27 +5,40 @@
 	
 	<div>
 		<span style="font-size: 20px;">{{username}} &bull; {{userrole}} </span>
-		<span style="margin-left: 20px; color: #f30; font-weight: bold;">粉丝 {{fansAmount}} 个</span>
+		<!-- <span style="margin-left: 20px; color: #f30; font-weight: bold;">粉丝 {{fansAmount}} 个</span> -->
 	</div>
 
 	<div>
 		<span id="updateMsgBtn" class="update-msg-btn" ng-click="showUpdateMessage()">设置</span>
+		<span id="logOutBtn" class="update-msg-btn" style="margin-left: 20px;" ng-click="logOut()">注销</span>
 	</div>
 
 </div>
-<div id="userAskQuestion" class="user-ask-question">
-	<span>我提出的问题</span>
+
+<div id="invitedToAnswerQuestion" class="invited-to-answer-question">
+	<span style="color: #f30; font-weight: bold;">我收到的邀请</span>
+	<span style="color: #f30; font-weight: bold;margin-left: 30px;">{{invitedQuestionsNum}}个</span>
 	<ul class="question-ul">
-		<li ng-repeat="question in currentUserQuestions"><span>{{question.q_title}}</span></li>
+		<li ng-repeat="question in invitedQuestions" ng-click="showCurQuestion(question.q_id)"><span>{{question.q_title}}</span></li>
+	</ul>
+</div>
+
+<div id="userAskQuestion" class="user-ask-question">
+	<span style="color: #f30; font-weight: bold;">我提出的问题</span>
+	<span style="color: #f30; font-weight: bold;margin-left: 30px;">{{questionNum}}个</span>
+	<ul class="question-ul">
+		<li ng-repeat="question in currentUserQuestions" ng-click="showCurQuestion(question.q_id)"><span>{{question.q_title}}</span></li>
 	</ul>
 </div>
 
 <div id="userResponseQuestion" class="user-response-question">
-	<span>我回答的问题</span>
+	<span style="color: #f30; font-weight: bold;">我回答的问题</span>
+	<span style="color: #f30; font-weight: bold;margin-left: 30px;">{{answersNum}}个</span>
 	<ul class="question-ul">
-		<li>response 1</li>
-		<li>response 2</li>
-		<li>response 3</li>
+		<li ng-repeat="answer in currentUserAswers" ng-click="showCurQuestion(answer.a_q_id)">
+			<span>{{answer.a_q_title}}</span>
+			<!-- <span style="color: #f30;">{{answer.a_content}}</span> -->
+		</li>
 	</ul>
 </div>
 

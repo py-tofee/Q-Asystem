@@ -9,7 +9,7 @@
 		'angular'
 		], function (angular) {
 
-			function AppController ($scope, $window, $cookies, $http) {
+			function AppController ($scope, $window, $cookies, $http, homePageService) {
 
 				$scope.selectesMenu = 'homePage'
 
@@ -26,11 +26,19 @@
 						}
 					})
 				}
+
+				$('.search-form').keydown(function (e) {
+					var e = e || event
+					var keycode = e.which || e.keyCode
+					if(keycode == 13) {
+						homePageService.getController().initQuestion($('#query').val(), 1)
+					}
+				})
 				
 			}
 
 			function init (App) {
-				App.controller('AppController', ['$scope', '$window', '$cookies', '$http', AppController])
+				App.controller('AppController', ['$scope', '$window', '$cookies', '$http', 'homePageService', AppController])
 				return AppController
 			}
 

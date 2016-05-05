@@ -5,7 +5,7 @@
 			'angular'
 		], function (angular) {
 			
-			function userMessageController ($scope, $http, $cookies, userMessageService) {
+			function userMessageController ($scope, $http, $cookies, $location, userMessageService, homePageService) {
 
 				$scope.username = $cookies.username
 				$scope.userrole = $cookies.user_role
@@ -114,6 +114,22 @@
 					})
 				}
 
+				// 获取用户 收到的邀请
+				$scope.getCurUserInvitedQuestions = function () {
+					$.ajax({
+						type: 'post',
+						url: 'http://127.0.0.1:5000/QASystem/get/currentUser/invited/questions',
+						data: formdata,
+						dataType: 'json',
+						success: function (response) {
+							if(response.data.message == 'success'){
+								$scope.invitedQuestions = response.data.invitedQuestions
+								$scope.invitedQuestionsNum = response.data.invitedQuestionsNum
+							}
+						}
+					})
+				}
+
 				// 获取用户 提的问题
 				$scope.getCurUserQuestions = function () {
 					$.ajax({
@@ -124,20 +140,50 @@
 						success: function (response) {
 							if(response.data.message == 'success'){
 								$scope.currentUserQuestions = response.data.questions
+								$scope.questionNum = response.data.questionNum
 							}
 						}
 					})
 				}
 
+				// 获取用户 回答的问题
+				$scope.getCurUserAnswers = function () {
+					$.ajax({
+						type: 'post',
+						url: 'http://127.0.0.1:5000/QASystem/get/currentUser/answers',
+						data: formdata,
+						dataType: 'json',
+						success: function(response) {
+							if (response.data.message == 'success') {
+								$scope.currentUserAswers = response.data.useranswers
+								$scope.answersNum = response.data.answersNum
+							}
+						}
+					})
+				}
+
+				$scope.showCurQuestion = function (questionID) {
+					homePageService.getController().showCurQuestion(questionID)
+				}
+
+				//注销
+				$scope.logOut = function () {
+					$location.path('/Q&A-system')
+				}
+
 
 				getPhotoPath() //获取用户的头像
+				$scope.getCurUserInvitedQuestions()
 				$scope.getCurUserQuestions()
+				$scope.getCurUserAnswers()
 
 
 			}
 
+
+
 			function init(App) {
-				App.controller('userMessageController', ['$scope', '$http', '$cookies', 'userMessageService', userMessageController])
+				App.controller('userMessageController', ['$scope', '$http', '$cookies', '$location', 'userMessageService', 'homePageService', userMessageController])
 				return userMessageController
 			}
 

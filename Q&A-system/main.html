@@ -9,7 +9,7 @@
 		</div>
 	</div>
 	<!-- right -->
-	<div class="rightContainer">
+	<div class="rightContainer" id="rightContainer">
 		<div class="right-content-header">
 			<ul class="menu-box">
 				<li class="menu-bar home-page-bar" ng-class="{'menu-active': selectesMenu == 'homePage'}" ng-click="activeMenu('homePage')"><span>首页</span></li>
@@ -17,7 +17,7 @@
 				<li class="menu-bar ask-question-bar" ng-class="{'menu-active': selectesMenu == 'askQuestion'}" ng-click="activeMenu('askQuestion')"><span>我要提问</span></li>
 				<li class="search" >
 					<form class="search-form">
-						<input class="search-query" name="query" placeholder="搜索" type="search" />
+						<input class="search-query" name="query" id="query" placeholder="搜索" type="text" />
 					</form>
 				</li>
 			</ul>

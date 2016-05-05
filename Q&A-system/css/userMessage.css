@@ -18,7 +18,7 @@
 	cursor: pointer;
 }
 
-.user-ask-question, .user-response-question {
+.invited-to-answer-question, .user-ask-question, .user-response-question {
 	width: 360px;
 	margin: 30px auto;
 }

@@ -17,6 +17,15 @@
 
 				$scope.askQuestionVisible = false
 
+				$('#selectQuestionType').on('change', function () {
+					if ($('#selectQuestionType').val() == '自定义') {
+						$('#questionType').attr('disabled', false)
+					}
+					else {
+						$('#questionType').attr('disabled', true)
+					}
+				})
+
 				// 响应menu的点击
 				$scope.$bus.subscribe({
 					channel: 'menu',
@@ -24,21 +33,51 @@
 					callback: function (data) {
 						if(data.name == 'askQuestion') {
 							$scope.askQuestionVisible = true
+							getAllTypes ()
+
 						}
 						else {
 							$scope.askQuestionVisible = false
 						}
 					}
 				})
+				// 获取所有的问题类型
+				function getAllTypes () {
+					$.ajax({
+						type: 'get',
+						url: 'http://127.0.0.1:5000/QASystem/get/allTypes',
+						dataType: 'json',
+						success: function (response) {
+							if(response.data.message == 'success') {
+								$scope.allTypes = response.data.allTypes
+							}
+						}
+					})
+				}
 
 				// 创建问题
 				$scope.createQuestion = function () {
 					var contentHTML = $('.note-editable')[0].innerHTML
+
+					var questionType = ''
+					if ($('#selectQuestionType').val() == '自定义') {
+						questionType = $scope.questionType
+						
+					}
+					else if ($('#selectQuestionType').val() == '请选择问题类型') {
+						alert('请选择问题类型')
+						return
+					}
+					else {
+						questionType = $('#selectQuestionType').val()
+					}
+
 					var questionData = {
-						'q_category': $scope.questionType,
+						'q_category': questionType,
 						'q_title': $scope.questionTitle,
 						'q_content': contentHTML,
-						'q_userid': $cookies.user_id
+						'q_userid': $cookies.user_id,
+						'invited_user_name': $scope.invitedUserName
 					}
 
 					$.ajax({
@@ -59,7 +98,7 @@
 						}
 					})
 				}
-
+				getAllTypes()
 
 
 			}

@@ -123,7 +123,7 @@
 
 .comment-text {
 	padding: 5px;
-	border: 1px solid #666;
+	border: 1px solid #aaa;
 }
 
 .comment-content {
@@ -137,4 +137,17 @@
 }
 .comment-content:focus {
 	outline: none;
+}
+
+.answers-ul li{
+	list-style: none;
+	padding: 10px 0;
+	border-bottom: 1px dashed #aaa;
+}
+
+.invited-person {
+	margin-right: 10px;
+	border: none;
+	padding: 5px;
+	background: transparent;
 }

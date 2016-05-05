@@ -56,11 +56,12 @@ class Question(db.Model):
 	q_read_amount = db.Column(db.Integer) # 阅读量/访问量
 	q_concern_amount = db.Column(db.Integer) # 关注该问题的用户数量
 	q_answer_amount = db.Column(db.Integer) # 评论量（答案量）
+	q_invited_userid = db.Column(db.Integer) # 被邀请回答该问题的用户id（选填）
 
 	q_userid = db.Column(db.Integer, db.ForeignKey('user.user_id'))
 	user = db.relationship('User', backref=db.backref('question', lazy='dynamic'))
 
-	def __init__(self, q_category, q_title, q_content, user, q_create_time=None, q_read_amount=0, q_concern_amount=0):
+	def __init__(self, q_category, q_title, q_content, user, q_invited_userid=-1, q_create_time=None, q_read_amount=0, q_concern_amount=0, q_answer_amount=0):
 		self.q_id = self.get_id()
 		self.q_category = q_category
 		self.q_title = q_title
@@ -71,8 +72,9 @@ class Question(db.Model):
 		self.q_create_time = q_create_time
 		self.q_read_amount = q_read_amount
 		self.q_concern_amount = q_concern_amount
-		self.q_answer_amount = len(self.answer.all())
+		self.q_answer_amount = q_answer_amount
 		self.user = user
+		self.q_invited_userid = q_invited_userid
 
 	def get_id(self):
 		if not self.q_id:
@@ -98,13 +100,14 @@ class Answer(db.Model):
 	a_qid = db.Column(db.Integer, db.ForeignKey('question.q_id'))
 	question = db.relationship('Question', backref=db.backref('answer', lazy='dynamic'))
 
-	def __init__(self, a_content, user, question, a_create_time=None):
+	def __init__(self, a_content, user, question, a_create_time=None, a_like_amount=0):
 		self.a_id = self.get_id()
 		self.a_content = a_content
 		if a_create_time is None:
 			now = datetime.now()
 			a_create_time = now.strftime('%Y-%m-%d')
 		self.a_create_time = a_create_time
+		self.a_like_amount = a_like_amount
 		self.user = user
 		self.question = question
 
